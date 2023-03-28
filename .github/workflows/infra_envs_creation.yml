@@ -1,0 +1,80 @@
+name: 'Infra Envs Creation'
+
+on:
+  workflow_dispatch:
+
+env:
+  TERRAFORM_VERSION: 1.3.9
+  TERRAFORM_WORKING_DIRECTORY_ENVS: "infrastructure/terraform/envs"
+
+permissions:
+  id-token: write
+  contents: read
+  security-events: write
+
+jobs:
+  tf-deploy-infra-dev:
+    runs-on: 
+    environment: dev
+    strategy:
+      matrix:
+        layer: ['10_ressource']
+      max-parallel: 1
+    env:
+      ARM_CLIENT_ID: ${{ }}
+      ARM_TENANT_ID: ${{ }}
+      ARM_SUBSCRIPTION_ID: ${{ }}
+      RG_NAME : ${{ }}
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: terraform plan and validate
+        uses: ./.github/actions/tf-plan-and-validate
+        with:
+          terraform_version: ${{ env.TERRAFORM_VERSION }}
+          environment: dev
+          resource_group_name: ${{ env.RG_NAME }}
+          layer: ${{ matrix.layer }}
+          working_directory: ${{ env.TERRAFORM_WORKING_DIRECTORY_ENVS }}
+
+      - name: terraform apply
+        uses: ./.github/actions/tf-apply
+        with:
+          terraform_version: ${{ env.TERRAFORM_VERSION }}
+          environment: dev
+          resource_group_name: ${{ env.RG_NAME }}
+          layer: ${{ matrix.layer }}
+          working_directory: ${{ env.TERRAFORM_WORKING_DIRECTORY_ENVS }}
+
+  tf-deploy-infra-prod:
+    runs-on: 
+    environment: prod
+    strategy:
+      matrix:
+        layer: ['10_ressource']
+      max-parallel: 1
+    env:
+      ARM_CLIENT_ID: ${{ }}
+      ARM_TENANT_ID: ${{ }}
+      ARM_SUBSCRIPTION_ID: ${{ }}
+      RG_NAME : ${{ }}
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: terraform plan and validate
+        uses: ./.github/actions/tf-plan-and-validate
+        with:
+          terraform_version: ${{ env.TERRAFORM_VERSION }}
+          environment: prod
+          resource_group_name: ${{ env.RG_NAME }}
+          layer: ${{ matrix.layer }}
+          working_directory: ${{ env.TERRAFORM_WORKING_DIRECTORY_ENVS }}
+
+      - name: terraform apply
+        uses: ./.github/actions/tf-apply
+        with:
+          terraform_version: ${{ env.TERRAFORM_VERSION }}
+          environment: prod
+          resource_group_name: ${{ env.RG_NAME }}
+          layer: ${{ matrix.layer }}
+          working_directory: ${{ env.TERRAFORM_WORKING_DIRECTORY_ENVS }}

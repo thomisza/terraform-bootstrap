@@ -1,0 +1,63 @@
+name: 'Infra Envs Destroy'
+
+on:
+  workflow_dispatch:
+
+env:
+  TERRAFORM_VERSION: 1.3.9
+  TERRAFORM_WORKING_DIRECTORY_ENVS: "infrastructure/terraform/envs"
+
+permissions:
+  id-token: write
+  contents: read
+  security-events: write
+
+jobs:
+  destroy-dev:
+    name: 'Destory DEV infra'
+    runs-on: 
+    environment: dev
+    strategy:
+      matrix:
+        layer: ['10_ressource']
+      max-parallel: 1
+    env:
+      ARM_CLIENT_ID: ${{ }}
+      ARM_TENANT_ID: ${{ }}
+      ARM_SUBSCRIPTION_ID: ${{ }}
+      RG_NAME : ${{ }}
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: terraform destroy
+        uses: ./.github/actions/tf-destroy
+        with:
+          terraform_version: ${{ env.TERRAFORM_VERSION }}
+          environment: dev
+          resource_group_name: ${{ env.RG_NAME }}
+          layer: ${{ matrix.layer }}
+          working_directory: ${{ env.TERRAFORM_WORKING_DIRECTORY_ENVS }}
+
+  tf-deploy-infra-prod:
+    runs-on: 
+    environment: prod
+    strategy:
+      matrix:
+        layer: ['10_ressource']
+      max-parallel: 1
+    env:
+      ARM_CLIENT_ID: ${{ }}
+      ARM_TENANT_ID: ${{ }}
+      ARM_SUBSCRIPTION_ID: ${{ }}
+      RG_NAME : ${{ }}
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: terraform destroy
+        uses: ./.github/actions/tf-destroy
+        with:
+          terraform_version: ${{ env.TERRAFORM_VERSION }}
+          environment: prod
+          resource_group_name: ${{ env.RG_NAME }}
+          layer: ${{ matrix.layer }}
+          working_directory: ${{ env.TERRAFORM_WORKING_DIRECTORY_ENVS }}
