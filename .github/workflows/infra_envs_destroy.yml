@@ -25,7 +25,9 @@ jobs:
       ARM_CLIENT_ID: ${{ }}
       ARM_TENANT_ID: ${{ }}
       ARM_SUBSCRIPTION_ID: ${{ }}
-      RG_NAME : ${{ }}
+      RG_NAME : "azrg-project-d"
+      ST_NAME: "azstdproject01"
+      CT_NAME: "azctdproject01"
     steps:
       - uses: actions/checkout@v3
 
@@ -35,6 +37,8 @@ jobs:
           terraform_version: ${{ env.TERRAFORM_VERSION }}
           environment: dev
           resource_group_name: ${{ env.RG_NAME }}
+          storage_account_name: ${{ env.ST_NAME }}
+          container_name: ${{ env.CT_NAME }}
           layer: ${{ matrix.layer }}
           working_directory: ${{ env.TERRAFORM_WORKING_DIRECTORY_ENVS }}
 
@@ -49,7 +53,9 @@ jobs:
       ARM_CLIENT_ID: ${{ }}
       ARM_TENANT_ID: ${{ }}
       ARM_SUBSCRIPTION_ID: ${{ }}
-      RG_NAME : ${{ }}
+      RG_NAME : "azrg-project-p"
+      ST_NAME: "azstpproject01"
+      CT_NAME: "azctpproject01"
     steps:
       - uses: actions/checkout@v3
 
@@ -59,5 +65,7 @@ jobs:
           terraform_version: ${{ env.TERRAFORM_VERSION }}
           environment: prod
           resource_group_name: ${{ env.RG_NAME }}
+          storage_account_name: ${{ env.ST_NAME }}
+          container_name: ${{ env.CT_NAME }}
           layer: ${{ matrix.layer }}
           working_directory: ${{ env.TERRAFORM_WORKING_DIRECTORY_ENVS }}
